@@ -17,6 +17,10 @@ fun main(array: Array<String>) {
     }
 }
 
+private fun a(){
+
+}
+
 private fun String.exec() {
     val process = Runtime.getRuntime().exec(this)
     val reader = BufferedReader(InputStreamReader(process.inputStream))
