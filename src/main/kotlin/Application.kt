@@ -1,26 +1,20 @@
+import com.lordcodes.turtle.GitCommands
+import com.lordcodes.turtle.shellRun
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
 import java.util.concurrent.TimeUnit
 
+private const val REMOTE_URL= "remote_url"
+
 fun main(array: Array<String>) {
-    val version = "1.1.0"
-//    val s =
-//        "curl -L --url https://kalpesh83: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@maven.pkg.github.com/kalpesh83/release-automator/sharechat/library/automator/$version/automator-$version.jar -o automator.jar"
-//    val ex = Runtime.getRuntime().exec(s)
-//    ex.inputStream.reader().use {
-//        println(it.readText())
-//    }
-//    ex.waitFor()
-//    println(s.runCommand())
-//    Thread.sleep(1000)
-//
-//    println(output)
-//    println("git init".runCommand())
-//    println("git status".runCommand())
-    "git add .".runCommand()
-    "git commit -m 'Init project'".runCommand()
-    "git push origin HEAD".runCommand()
+//    "git add .".runCommand()
+//    "git commit -m 'Init project'".runCommand()
+//    "git push origin HEAD".runCommand()
+    shellRun {
+        git.commitAllChanges("Update gradle scripts")
+        git.pushToOrigin()
+    }
 }
 
 private fun String.exec() {

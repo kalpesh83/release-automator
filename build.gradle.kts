@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.konan.properties.hasProperty
 import java.io.FileInputStream
 import java.io.InputStreamReader
@@ -5,22 +6,11 @@ import java.util.*
 
 plugins {
     application
-    kotlin("jvm") version "1.9.21"
+    id("org.jetbrains.kotlin.jvm")
     `maven-publish`
 }
 
-version = "1.1.0"
-
-buildscript {
-    repositories {
-        gradlePluginPortal()
-        mavenCentral()
-    }
-
-    dependencies {
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.21")
-    }
-}
+version = "1.1.1"
 
 tasks.withType(Jar::class.java) {
     manifest {
@@ -61,23 +51,30 @@ application {
     mainClass.set("ApplicationKt")
 }
 
-repositories {
-    google()
-    gradlePluginPortal()
-    mavenCentral()
-}
-
 
 dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("com.lordcodes.turtle:turtle:0.10.0")
 }
 
 tasks.test {
     useJUnitPlatform()
 }
+//kotlin {
+//    jvmToolchain(17)
+//}
 kotlin {
-    jvmToolchain(11)
+    compilerOptions {
+        jvmTarget = JvmTarget.JVM_17
+        freeCompilerArgs.add("-Xcontext-receivers")
+        freeCompilerArgs.add("-Xjdk-release=17")
+        optIn.add("kotlinx.serialization.ExperimentalSerializationApi")
+    }
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
 }
 
 fun getLocalProperty(key: String): Any {
