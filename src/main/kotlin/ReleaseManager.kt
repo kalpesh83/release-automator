@@ -56,6 +56,7 @@ class ReleaseManager(
     private fun updateVersionAndPush(addCodeOwners: Boolean = false) {
         // Checkout to release branch and pull latest changes
         shellRun {
+            git.pull(gitProperties.origin)
             git.checkout(gitProperties.branch)
             git.pull(gitProperties.origin)
         }
