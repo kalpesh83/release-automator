@@ -35,7 +35,7 @@ class ReleaseManager(
             // Commit the version changes and push to main
             shellRun {
                 git.commitAllChanges(message)
-                git.push(gitProperties.origin)
+                git.push(gitProperties.origin, MAIN_BRANCH)
             }
             // Update version and push to release-v* branch
             val updatedVersionForRelease = VersionProperties.get().increment(false)
@@ -46,7 +46,7 @@ class ReleaseManager(
             shellRun {
                 git.checkout(releaseBranchName)
                 git.commitAllChanges(releaseMessage)
-                git.push(gitProperties.origin)
+                git.push(gitProperties.origin, releaseBranchName)
             }
         } else {
             updateVersionAndPush()
@@ -70,7 +70,7 @@ class ReleaseManager(
         }
         shellRun {
             git.commitAllChanges(releaseMessage)
-            git.push(gitProperties.origin)
+            git.push(gitProperties.origin, gitProperties.branch)
         }
     }
 
