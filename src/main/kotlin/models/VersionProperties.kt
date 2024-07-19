@@ -96,4 +96,6 @@ data class VersionProperties(
         File(VERSION_FILE_NAME).writeText(sb.toString())
     }
 
+    fun buildMessage() = "Update versionName to $versionName and versionCode to $versionCode"
+
 }
