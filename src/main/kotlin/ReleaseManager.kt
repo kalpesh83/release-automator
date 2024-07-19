@@ -2,16 +2,22 @@ import com.lordcodes.turtle.shellRun
 import models.GitProperties
 import models.ReleaseProperties
 import models.VersionProperties
+import java.io.File
 
 class ReleaseManager(
     private val gitProperties: GitProperties,
     private val releaseProperties: ReleaseProperties
 ) {
 
+    companion object {
+        private const val SC_CODE_OWNERS = "* @ShareChat/sc-appx"
+        private const val CODE_OWNERS_FILE_PATH = ".github/CODEOWNERS"
+    }
+
     fun release() {
         when (releaseProperties.rolloutType) {
             RolloutType.BETA_ROLLOUT -> doBetaRollout(releaseProperties.isNewRelease)
-            RolloutType.PROD_ROLLOUT -> TODO()
+            RolloutType.PROD_ROLLOUT -> updateVersionAndPush(true)
         }
     }
 
@@ -25,8 +31,7 @@ class ReleaseManager(
             val versionProps = VersionProperties.get()
             val updatedVersionForMain = versionProps.increment(true)
             updatedVersionForMain.updatePropertiesFile()
-            val message =
-                "Update versionName to ${updatedVersionForMain.versionName} and versionCode to ${updatedVersionForMain.versionCode}"
+            val message = updatedVersionForMain.buildMessage()
             // Commit the version changes and push to main
             shellRun {
                 git.commitAllChanges(message)
@@ -37,28 +42,41 @@ class ReleaseManager(
             val releaseBranchName =
                 RELEASE_BRANCH_PREFIX + "${updatedVersionForRelease.major}.${updatedVersionForRelease.minor}"
             updatedVersionForRelease.updatePropertiesFile()
-            val releaseMessage =
-                "Update versionName to ${updatedVersionForRelease.versionName} and versionCode to ${updatedVersionForRelease.versionCode}"
+            val releaseMessage = updatedVersionForRelease.buildMessage()
             shellRun {
                 git.checkout(releaseBranchName)
                 git.commitAllChanges(releaseMessage)
                 git.push(gitProperties.origin)
             }
         } else {
-            // Checkout to release branch and pull latest changes
-            shellRun {
-                git.checkout(gitProperties.branch)
-                git.pull(gitProperties.origin)
-            }
-            val versionProps = VersionProperties.get()
-            val updatedVersion = versionProps.increment(false)
-            updatedVersion.updatePropertiesFile()
-            val releaseMessage =
-                "Update versionName to ${updatedVersion.versionName} and versionCode to ${updatedVersion.versionCode}"
-            shellRun {
-                git.commitAllChanges(releaseMessage)
-                git.push(gitProperties.origin)
-            }
+            updateVersionAndPush()
         }
+    }
+
+    private fun updateVersionAndPush(addCodeOwners: Boolean = false) {
+        // Checkout to release branch and pull latest changes
+        shellRun {
+            git.checkout(gitProperties.branch)
+            git.pull(gitProperties.origin)
+        }
+        val versionProps = VersionProperties.get()
+        val updatedVersion = versionProps.increment(false)
+        updatedVersion.updatePropertiesFile()
+        if (addCodeOwners) {
+            addCodeOwnersIfNotExists()
+        }
+        val releaseMessage = updatedVersion.buildMessage()
+        shellRun {
+            git.commitAllChanges(releaseMessage)
+            git.push(gitProperties.origin)
+        }
+    }
+
+    private fun addCodeOwnersIfNotExists() {
+        val file = File(CODE_OWNERS_FILE_PATH)
+        file.readLines().forEach {
+            if (it.contains(SC_CODE_OWNERS)) return
+        }
+        file.appendText("\n$SC_CODE_OWNERS")
     }
 }
