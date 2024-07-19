@@ -56,28 +56,30 @@ class ReleaseManager(
     private fun updateVersionAndPush(addCodeOwners: Boolean = false) {
         // Checkout to release branch and pull latest changes
         shellRun {
-            git.gitCommand(listOf("fetch"))
+            // Used for local testing. On TC the agents will be updated with all the refs already.
+//            git.gitCommand(listOf("fetch"))
             git.checkout(gitProperties.branch, false)
             git.pull(gitProperties.origin, gitProperties.branch)
         }
         val versionProps = VersionProperties.get()
         val updatedVersion = versionProps.increment(false)
         updatedVersion.updatePropertiesFile()
-        if (addCodeOwners) {
-            addCodeOwnersIfNotExists()
+        var releaseMessage = updatedVersion.buildMessage()
+        if (addCodeOwners && addCodeOwnersIfNotExists()) {
+            releaseMessage += " and update CODEOWNERS"
         }
-        val releaseMessage = updatedVersion.buildMessage()
         shellRun {
             git.commitAllChanges(releaseMessage)
             git.push(gitProperties.origin)
         }
     }
 
-    private fun addCodeOwnersIfNotExists() {
+    private fun addCodeOwnersIfNotExists(): Boolean {
         val file = File(CODE_OWNERS_FILE_PATH)
         file.readLines().forEach {
-            if (it.contains(SC_CODE_OWNERS)) return
+            if (it.contains(SC_CODE_OWNERS)) return false
         }
         file.appendText("\n$SC_CODE_OWNERS")
+        return true
     }
 }
