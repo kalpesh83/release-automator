@@ -56,9 +56,9 @@ class ReleaseManager(
     private fun updateVersionAndPush(addCodeOwners: Boolean = false) {
         // Checkout to release branch and pull latest changes
         shellRun {
-            git.pull(gitProperties.origin)
+            git.gitCommand(listOf("fetch"))
             git.checkout(gitProperties.branch)
-            git.pull(gitProperties.origin)
+            git.pull(gitProperties.origin, gitProperties.branch)
         }
         val versionProps = VersionProperties.get()
         val updatedVersion = versionProps.increment(false)
