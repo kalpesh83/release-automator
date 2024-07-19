@@ -1,38 +1,13 @@
-import com.lordcodes.turtle.GitCommands
-import com.lordcodes.turtle.shellRun
-import java.io.BufferedReader
+import models.GitProperties
+import models.ReleaseProperties
 import java.io.IOException
-import java.io.InputStreamReader
 import java.util.concurrent.TimeUnit
 
-private const val REMOTE_URL= "remote_url"
-
 fun main(array: Array<String>) {
-//    "git add .".runCommand()
-//    "git commit -m 'Init project'".runCommand()
-//    "git push origin HEAD".runCommand()
-    shellRun {
-        git.commitAllChanges("Update gradle scripts")
-        git.pushToOrigin()
-    }
-}
-
-private fun a(){
-
-}
-
-private fun String.exec() {
-    val process = Runtime.getRuntime().exec(this)
-    val reader = BufferedReader(InputStreamReader(process.inputStream))
-    var read: Int
-    val buffer = CharArray(4096)
-    val output = StringBuffer()
-    while ((reader.read(buffer).also { read = it }) > 0) {
-        output.append(buffer, 0, read)
-    }
-    reader.close()
-    process.waitFor()
-    println(output)
+    val gitProperties = GitProperties.get(array)
+    val releaseProperties = ReleaseProperties.get(gitProperties)
+    ReleaseManager(gitProperties = gitProperties, releaseProperties = releaseProperties)
+        .release()
 }
 
 fun String.runCommand() {
@@ -40,7 +15,6 @@ fun String.runCommand() {
         println("Executing: $this")
         val parts = this.split("\\s".toRegex())
         val proc = ProcessBuilder(*parts.toTypedArray())
-//            .directory(workingDir)
             .redirectOutput(ProcessBuilder.Redirect.PIPE)
             .redirectError(ProcessBuilder.Redirect.PIPE)
             .start()
