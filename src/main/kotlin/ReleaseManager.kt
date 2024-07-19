@@ -57,7 +57,7 @@ class ReleaseManager(
         // Checkout to release branch and pull latest changes
         shellRun {
             git.gitCommand(listOf("fetch"))
-            git.checkout(gitProperties.branch)
+            git.checkout(gitProperties.branch, false)
             git.pull(gitProperties.origin, gitProperties.branch)
         }
         val versionProps = VersionProperties.get()
