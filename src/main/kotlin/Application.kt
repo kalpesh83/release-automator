@@ -4,7 +4,7 @@ import java.io.IOException
 import java.util.concurrent.TimeUnit
 
 fun main(array: Array<String>) {
-    val a = arrayOf("remote", "https://github.com/kalpesh83/release-automator.git", "branch", "main")
+    val a = arrayOf("remote", "https://github.com/kalpesh83/release-automator.git", "branch", "release-v2024.9")
     val gitProperties = GitProperties.get(a)
     val releaseProperties = ReleaseProperties.get(gitProperties)
     ReleaseManager(gitProperties = gitProperties, releaseProperties = releaseProperties)
