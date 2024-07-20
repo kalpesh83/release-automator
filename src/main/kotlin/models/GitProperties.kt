@@ -13,6 +13,7 @@ class GitProperties private constructor(
         fun get(args: Array<String>): GitProperties {
             val origin = args.getOrigin()
             val branch = args.getBranch()
+            println("Specified branch: $branch")
             val branchType = BranchType.get(branch)
             return GitProperties(origin = origin, branch = branch, branchType = branchType)
         }

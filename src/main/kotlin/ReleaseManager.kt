@@ -15,6 +15,7 @@ class ReleaseManager(
     }
 
     fun release() {
+        println("Rollout type: ${releaseProperties.rolloutType}")
         when (releaseProperties.rolloutType) {
             RolloutType.BETA_ROLLOUT -> doBetaRollout(releaseProperties.isNewRelease)
             RolloutType.PROD_ROLLOUT -> updateVersionAndPush(true)
@@ -25,15 +26,20 @@ class ReleaseManager(
         if (isNewRelease) {
             // Pull latest changes from main
             shellRun {
+                println("Checking out to `main`")
                 git.checkout(MAIN_BRANCH)
+                println("Pulling latest changes from `main`")
                 git.pull(gitProperties.origin)
             }
             val versionProps = VersionProperties.get()
             val updatedVersionForMain = versionProps.increment(true)
+            println("`versionName` updated: ${versionProps.versionName} -> ${updatedVersionForMain.versionName}")
+            println("`versionCode` updated: ${versionProps.versionCode} -> ${updatedVersionForMain.versionCode}")
             updatedVersionForMain.updatePropertiesFile()
             val message = updatedVersionForMain.buildMessage()
             // Commit the version changes and push to main
             shellRun {
+                println("Pushing changes to `main`")
                 git.commitAllChanges(message)
                 git.push(gitProperties.origin, MAIN_BRANCH)
             }
@@ -44,7 +50,9 @@ class ReleaseManager(
             updatedVersionForRelease.updatePropertiesFile()
             val releaseMessage = updatedVersionForRelease.buildMessage()
             shellRun {
+                println("Checking out to $releaseBranchName")
                 git.checkout(releaseBranchName)
+                println("Pushing changes to `$releaseBranchName`")
                 git.commitAllChanges(releaseMessage)
                 git.push(gitProperties.origin, releaseBranchName)
             }
@@ -56,19 +64,25 @@ class ReleaseManager(
     private fun updateVersionAndPush(addCodeOwners: Boolean = false) {
         // Checkout to release branch and pull latest changes
         shellRun {
+            println("Checking out to ${gitProperties.branch}")
             // Used for local testing. On TC the agents will be updated with all the refs already.
 //            git.gitCommand(listOf("fetch"))
             git.checkout(gitProperties.branch, false)
+            println("Pulling latest changes from ${gitProperties.branch}")
             git.pull(gitProperties.origin, gitProperties.branch)
         }
         val versionProps = VersionProperties.get()
         val updatedVersion = versionProps.increment(false)
         updatedVersion.updatePropertiesFile()
+        println("versionName updated: ${versionProps.versionName} -> ${updatedVersion.versionName}")
+        println("versionCode updated: ${versionProps.versionCode} -> ${updatedVersion.versionCode}")
         var releaseMessage = updatedVersion.buildMessage()
         if (addCodeOwners && addCodeOwnersIfNotExists()) {
+            println("CODEOWNERS added")
             releaseMessage += " and update CODEOWNERS"
         }
         shellRun {
+            println("Pushing changes to ${gitProperties.branch}")
             git.commitAllChanges(releaseMessage)
             git.push(gitProperties.origin, gitProperties.branch)
         }
