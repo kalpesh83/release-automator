@@ -29,7 +29,7 @@ class ReleaseManager(
                 println("Checking out to `main`")
                 git.checkout(MAIN_BRANCH)
                 println("Pulling latest changes from `main`")
-                git.pull(gitProperties.origin)
+                git.pull(gitProperties.origin, MAIN_BRANCH)
             }
             val versionProps = VersionProperties.get()
             val updatedVersionForMain = versionProps.increment(true)
