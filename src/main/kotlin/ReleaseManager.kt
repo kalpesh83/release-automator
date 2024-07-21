@@ -68,6 +68,7 @@ class ReleaseManager(
             println("Checking out to ${gitProperties.branch}")
             // Used for local testing. On TC the agents will be updated with all the refs already.
             if (isCI.not()) {
+                println("Performing git fetch")
                 git.gitCommand(listOf("fetch"))
             }
             git.checkout(gitProperties.branch, false)
