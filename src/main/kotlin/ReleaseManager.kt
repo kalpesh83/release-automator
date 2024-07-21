@@ -5,6 +5,7 @@ import models.VersionProperties
 import java.io.File
 
 class ReleaseManager(
+    private val isCI: Boolean,
     private val gitProperties: GitProperties,
     private val releaseProperties: ReleaseProperties
 ) {
@@ -66,7 +67,9 @@ class ReleaseManager(
         shellRun {
             println("Checking out to ${gitProperties.branch}")
             // Used for local testing. On TC the agents will be updated with all the refs already.
-//            git.gitCommand(listOf("fetch"))
+            if (isCI.not()) {
+                git.gitCommand(listOf("fetch"))
+            }
             git.checkout(gitProperties.branch, false)
             println("Pulling latest changes from ${gitProperties.branch}")
             git.pull(gitProperties.origin, gitProperties.branch)

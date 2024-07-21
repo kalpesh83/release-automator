@@ -6,8 +6,12 @@ import java.util.concurrent.TimeUnit
 fun main(array: Array<String>) {
     val gitProperties = GitProperties.get(array)
     val releaseProperties = ReleaseProperties.get(gitProperties)
-    ReleaseManager(gitProperties = gitProperties, releaseProperties = releaseProperties)
-        .release()
+    val isCI = System.getenv("CI").toBoolean()
+    ReleaseManager(
+        isCI = isCI,
+        gitProperties = gitProperties,
+        releaseProperties = releaseProperties
+    ).release()
 }
 
 fun String.runCommand() {
