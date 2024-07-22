@@ -7,7 +7,8 @@ import java.io.File
 class ReleaseManager(
     private val isCI: Boolean,
     private val gitProperties: GitProperties,
-    private val releaseProperties: ReleaseProperties
+    private val releaseProperties: ReleaseProperties,
+    private val resultHandler: ResultHandler
 ) {
 
     companion object {
@@ -57,6 +58,7 @@ class ReleaseManager(
                 git.commitAllChanges(releaseMessage)
                 git.push(gitProperties.origin, releaseBranchName)
             }
+            resultHandler.outputFile?.writeText(releaseBranchName)
         } else {
             updateVersionAndPush()
         }

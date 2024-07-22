@@ -1,7 +1,4 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.konan.properties.hasProperty
-import java.io.FileInputStream
-import java.io.InputStreamReader
 import java.util.*
 
 plugins {

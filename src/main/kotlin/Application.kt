@@ -4,13 +4,15 @@ import java.io.IOException
 import java.util.concurrent.TimeUnit
 
 fun main(array: Array<String>) {
+    val resultHandler = ResultHandler.get(array)
     val gitProperties = GitProperties.get(array)
     val releaseProperties = ReleaseProperties.get(gitProperties)
     val isCI = System.getenv("CI").toBoolean()
     ReleaseManager(
         isCI = isCI,
         gitProperties = gitProperties,
-        releaseProperties = releaseProperties
+        releaseProperties = releaseProperties,
+        resultHandler = resultHandler
     ).release()
 }
 
