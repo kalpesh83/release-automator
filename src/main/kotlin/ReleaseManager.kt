@@ -72,8 +72,8 @@ class ReleaseManager(
                 slackNotifier.notify(
                     webhook = slackNotifier.releaseCutWebhook,
                     config = SlackNotificationConfig(
-                        versionCode = updatedVersionForRelease.versionCode.toString(),
-                        versionName = updatedVersionForRelease.versionName,
+                        versionCode = updatedVersionForMain.versionCode.toString(),
+                        versionName = updatedVersionForMain.versionName,
                         branch = releaseBranchName,
                         parent = tcProperties.parent
                     )
