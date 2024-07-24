@@ -76,7 +76,8 @@ class ReleaseManager(
                         versionCode = updatedVersionForMain.versionCode.toString(),
                         versionName = updatedVersionForMain.versionName,
                         branch = releaseBranchName,
-                        parent = tcProperties.parent
+                        parent = tcProperties.parent,
+                        message = buildDetailsMessage,
                     )
                 )
                 slackNotifier.notify(
