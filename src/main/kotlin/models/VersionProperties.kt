@@ -98,6 +98,7 @@ data class VersionProperties(
         val isFirstBeta = isFirstRelease && rolloutType == RolloutType.BETA_ROLLOUT && branchType == BranchType.Release
 
         p.entries.forEachIndexed { index, it ->
+            println("Key: ${it.key}, Value: ${it.value}")
             when (it.key) {
                 VERSION_CODE -> sb.append("${it.key}=${versionCode}")
                 VERSION_NAME -> sb.append("${it.key}=${versionName}")
