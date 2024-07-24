@@ -1,4 +1,4 @@
-enum class RolloutType {
-    BETA_ROLLOUT,
-    PROD_ROLLOUT;
+enum class RolloutType(val type: String) {
+    BETA_ROLLOUT("beta"),
+    PROD_ROLLOUT("prod");
 }

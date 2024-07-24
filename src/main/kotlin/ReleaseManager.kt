@@ -1,4 +1,5 @@
 import com.lordcodes.turtle.shellRun
+import models.BranchType
 import models.GitProperties
 import models.ReleaseProperties
 import models.VersionProperties
@@ -43,7 +44,13 @@ class ReleaseManager(
             val updatedVersionForMain = versionProps.increment(true)
             println("`versionName` updated: ${versionProps.versionName} -> ${updatedVersionForMain.versionName}")
             println("`versionCode` updated: ${versionProps.versionCode} -> ${updatedVersionForMain.versionCode}")
-            updatedVersionForMain.updatePropertiesFile()
+            updatedVersionForMain.updatePropertiesFile(
+                isFirstRelease = false,
+                branchType = BranchType.Main,
+                rolloutType = RolloutType.BETA_ROLLOUT,
+                parent = tcProperties.parent,
+                rolloutPercent = releaseProperties.rolloutPercent
+            )
             val message = updatedVersionForMain.buildMessage()
             // Commit the version changes and push to main
             shellRun {
@@ -55,7 +62,13 @@ class ReleaseManager(
             val updatedVersionForRelease = VersionProperties.get().increment(false)
             val releaseBranchName =
                 RELEASE_BRANCH_PREFIX + "${updatedVersionForRelease.major}.${updatedVersionForRelease.minor}"
-            updatedVersionForRelease.updatePropertiesFile()
+            updatedVersionForRelease.updatePropertiesFile(
+                isFirstRelease = true,
+                branchType = BranchType.Release,
+                rolloutType = RolloutType.BETA_ROLLOUT,
+                parent = tcProperties.parent,
+                rolloutPercent = releaseProperties.rolloutPercent
+            )
             val releaseMessage = updatedVersionForRelease.buildMessage()
             shellRun {
                 println("Checking out to $releaseBranchName")
@@ -109,7 +122,13 @@ class ReleaseManager(
         }
         val versionProps = VersionProperties.get()
         val updatedVersion = versionProps.increment(false)
-        updatedVersion.updatePropertiesFile()
+        updatedVersion.updatePropertiesFile(
+            isFirstRelease = false,
+            branchType = BranchType.get(gitProperties.branch),
+            rolloutType = releaseProperties.rolloutType,
+            parent = tcProperties.parent,
+            rolloutPercent = releaseProperties.rolloutPercent
+        )
         println("versionName updated: ${versionProps.versionName} -> ${updatedVersion.versionName}")
         println("versionCode updated: ${versionProps.versionCode} -> ${updatedVersion.versionCode}")
         var releaseMessage = updatedVersion.buildMessage()
