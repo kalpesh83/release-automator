@@ -5,6 +5,7 @@ import models.VersionProperties
 import notification.SlackNotificationConfig
 import notification.SlackNotifier
 import teamcity.TcBuildManager
+import teamcity.TcProperties
 import java.io.File
 
 class ReleaseManager(
@@ -12,7 +13,8 @@ class ReleaseManager(
     private val gitProperties: GitProperties,
     private val releaseProperties: ReleaseProperties,
     private val tcBuildManager: TcBuildManager,
-    private val slackNotifier: SlackNotifier
+    private val slackNotifier: SlackNotifier,
+    private val tcProperties: TcProperties
 ) {
 
     companion object {
@@ -72,12 +74,17 @@ class ReleaseManager(
                     config = SlackNotificationConfig(
                         versionCode = updatedVersionForRelease.versionCode.toString(),
                         versionName = updatedVersionForRelease.versionName,
-                        branch = releaseBranchName
+                        branch = releaseBranchName,
+                        parent = tcProperties.parent
                     )
                 )
                 slackNotifier.notify(
                     webhook = slackNotifier.regressionWebhook,
-                    config = SlackNotificationConfig(message = buildDetailsMessage, branch = releaseBranchName)
+                    config = SlackNotificationConfig(
+                        message = buildDetailsMessage,
+                        branch = releaseBranchName,
+                        parent = tcProperties.parent
+                    )
                 )
             }
         } else {

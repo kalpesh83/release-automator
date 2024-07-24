@@ -26,7 +26,8 @@ fun main(array: Array<String>) {
         gitProperties = gitProperties,
         releaseProperties = releaseProperties,
         tcBuildManager = tcBuildManager,
-        slackNotifier = slackNotifier
+        slackNotifier = slackNotifier,
+        tcProperties = tcProperties
     ).release()
 }
 
