@@ -118,6 +118,7 @@ data class VersionProperties(
             sb.append("\n")
             sb.append("${IS_FIRST_RELEASE}=true")
         }
+        println("Content: $sb")
         File(VERSION_FILE_NAME).writeText(sb.toString())
     }
 
