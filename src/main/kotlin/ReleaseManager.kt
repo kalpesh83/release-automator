@@ -69,6 +69,7 @@ class ReleaseManager(
                 val buildDetailsMessage = buildDetailsList.joinToString(separator = "\n") {
                     "${it.buildName}\n${it.buildUrl}"
                 }
+                println("Sending slack message")
                 slackNotifier.notify(
                     webhook = slackNotifier.releaseCutWebhook,
                     config = SlackNotificationConfig(

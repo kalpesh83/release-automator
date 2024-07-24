@@ -14,6 +14,7 @@ class TcBuildManager(
 
     fun triggerBuilds(branch: String): List<BuildDetails> {
         return args.fetchBuildIds().mapNotNull {
+            println("Triggering build for id: $it")
             trigger(id = it, branch = branch)
         }
     }
