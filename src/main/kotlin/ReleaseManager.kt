@@ -66,7 +66,7 @@ class ReleaseManager(
             }
             val buildDetailsList = tcBuildManager.triggerBuilds(releaseBranchName)
             if (buildDetailsList.isNotEmpty()) {
-                val buildDetailsMessage = buildDetailsList.joinToString(separator = "\n") {
+                val buildDetailsMessage = buildDetailsList.joinToString(separator = "\n\n") {
                     "${it.buildName}\n${it.buildUrl}"
                 }
                 println("Sending slack message")
