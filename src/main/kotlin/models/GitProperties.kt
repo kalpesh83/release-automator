@@ -1,6 +1,7 @@
 package models
 
 import BRANCH
+import REMOTE_URL
 
 class GitProperties private constructor(
     val origin: String,
@@ -8,11 +9,10 @@ class GitProperties private constructor(
     val branchType: BranchType
 ) {
     companion object {
-        private const val REMOTE_URL = "remote"
 
         fun get(args: Array<String>): GitProperties {
             val origin = args.getOrigin()
-            val branch = args.getBranch()
+            val branch = args.getBranch().replace("refs/heads/", "")
             println("Specified branch: $branch")
             val branchType = BranchType.get(branch)
             return GitProperties(origin = origin, branch = branch, branchType = branchType)

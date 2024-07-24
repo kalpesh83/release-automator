@@ -2,13 +2,17 @@ import com.lordcodes.turtle.shellRun
 import models.GitProperties
 import models.ReleaseProperties
 import models.VersionProperties
+import notification.SlackNotificationConfig
+import notification.SlackNotifier
+import teamcity.TcBuildManager
 import java.io.File
 
 class ReleaseManager(
     private val isCI: Boolean,
     private val gitProperties: GitProperties,
     private val releaseProperties: ReleaseProperties,
-    private val resultHandler: ResultHandler
+    private val tcBuildManager: TcBuildManager,
+    private val slackNotifier: SlackNotifier
 ) {
 
     companion object {
@@ -58,7 +62,24 @@ class ReleaseManager(
                 git.commitAllChanges(releaseMessage)
                 git.push(gitProperties.origin, releaseBranchName)
             }
-            resultHandler.outputFile?.writeText(releaseBranchName)
+            val buildDetailsList = tcBuildManager.triggerBuilds(releaseBranchName)
+            if (buildDetailsList.isNotEmpty()) {
+                val buildDetailsMessage = buildDetailsList.joinToString(separator = "\n") {
+                    "${it.buildName}\n${it.buildUrl}"
+                }
+                slackNotifier.notify(
+                    webhook = slackNotifier.releaseCutWebhook,
+                    config = SlackNotificationConfig(
+                        versionCode = updatedVersionForRelease.versionCode.toString(),
+                        versionName = updatedVersionForRelease.versionName,
+                        branch = releaseBranchName
+                    )
+                )
+                slackNotifier.notify(
+                    webhook = slackNotifier.regressionWebhook,
+                    config = SlackNotificationConfig(message = buildDetailsMessage, branch = releaseBranchName)
+                )
+            }
         } else {
             updateVersionAndPush()
         }
@@ -92,6 +113,7 @@ class ReleaseManager(
             git.commitAllChanges(releaseMessage)
             git.push(gitProperties.origin, gitProperties.branch)
         }
+        tcBuildManager.triggerBuilds(gitProperties.branch)
     }
 
     private fun addCodeOwnersIfNotExists(): Boolean {
