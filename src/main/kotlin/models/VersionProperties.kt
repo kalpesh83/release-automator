@@ -113,7 +113,9 @@ data class VersionProperties(
         if (parent == Parent.ShareChat && isFirstBeta) {
             sb.append("\n")
             sb.append("${ROLL_OUT_PERCENT}=${rolloutPercent}")
+            sb.append("\n")
             sb.append("${ROLL_OUT_ENV}=${rolloutType.type}")
+            sb.append("\n")
             sb.append("${IS_FIRST_RELEASE}=true")
         }
         File(VERSION_FILE_NAME).writeText(sb.toString())
