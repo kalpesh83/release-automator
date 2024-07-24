@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit
 
 fun main(array: Array<String>) {
     val gitProperties = GitProperties.get(array)
-    val releaseProperties = ReleaseProperties.get(gitProperties)
+    val releaseProperties = ReleaseProperties.get(args = array, gitProperties = gitProperties)
     val isCI = System.getenv("CI").toBoolean()
 
     val service = Service()
