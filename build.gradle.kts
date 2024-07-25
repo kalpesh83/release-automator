@@ -7,7 +7,7 @@ plugins {
     `maven-publish`
 }
 
-version = "1.2.8"
+version = "1.2.9"
 
 tasks.withType(Jar::class.java) {
     manifest {
