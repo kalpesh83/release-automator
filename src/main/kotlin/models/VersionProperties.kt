@@ -16,7 +16,7 @@ data class VersionProperties(
     val patch: String
 ) {
     companion object {
-        private const val VERSION_FILE_NAME = "version.properties"
+        const val VERSION_FILE_NAME = "version.properties"
         private const val VERSION_CODE = "VERSION_CODE"
         private const val VERSION_NAME = "VERSION_NAME"
         private const val ROLL_OUT_PERCENT = "ROLL_OUT_PERCENT"

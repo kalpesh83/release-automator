@@ -55,7 +55,8 @@ class ReleaseManager(
             // Commit the version changes and push to main
             shellRun {
                 println("Pushing changes to `main`")
-                git.commitAllChanges(message)
+                git.gitCommand(listOf("add", VersionProperties.VERSION_FILE_NAME))
+                git.commit(message)
                 git.push(gitProperties.origin, MAIN_BRANCH)
             }
             // Update version and push to release-v* branch
@@ -74,7 +75,8 @@ class ReleaseManager(
                 println("Checking out to $releaseBranchName")
                 git.checkout(releaseBranchName)
                 println("Pushing changes to `$releaseBranchName`")
-                git.commitAllChanges(releaseMessage)
+                git.gitCommand(listOf("add", VersionProperties.VERSION_FILE_NAME))
+                git.commit(releaseMessage)
                 git.push(gitProperties.origin, releaseBranchName)
             }
             val buildDetailsList = tcBuildManager.triggerBuilds(releaseBranchName)
@@ -132,13 +134,19 @@ class ReleaseManager(
         println("versionName updated: ${versionProps.versionName} -> ${updatedVersion.versionName}")
         println("versionCode updated: ${versionProps.versionCode} -> ${updatedVersion.versionCode}")
         var releaseMessage = updatedVersion.buildMessage()
+        var codeOwnersAdded = false
         if (addCodeOwners && addCodeOwnersIfNotExists()) {
             println("CODEOWNERS added")
             releaseMessage += " and update CODEOWNERS"
+            codeOwnersAdded = true
         }
         shellRun {
             println("Pushing changes to ${gitProperties.branch}")
-            git.commitAllChanges(releaseMessage)
+            git.gitCommand(listOf("add", VersionProperties.VERSION_FILE_NAME))
+            if (codeOwnersAdded) {
+                git.gitCommand(listOf("add", CODE_OWNERS_FILE_PATH))
+            }
+            git.commit(releaseMessage)
             git.push(gitProperties.origin, gitProperties.branch)
         }
         tcBuildManager.triggerBuilds(gitProperties.branch)
