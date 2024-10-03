@@ -37,8 +37,8 @@ class ReleaseManager(
             shellRun {
                 println("Checking out to `main`")
                 git.checkout(MAIN_BRANCH)
-                println("Pulling latest changes from `main`")
-                git.pull(gitProperties.origin, MAIN_BRANCH)
+//                println("Pulling latest changes from `main`")
+//                git.pull(gitProperties.origin, MAIN_BRANCH)
             }
             val versionProps = VersionProperties.get()
             val updatedVersionForMain = versionProps.increment(true)
@@ -119,8 +119,8 @@ class ReleaseManager(
                 git.gitCommand(listOf("fetch"))
             }
             git.checkout(gitProperties.branch, false)
-            println("Pulling latest changes from ${gitProperties.branch}")
-            git.pull(gitProperties.origin, gitProperties.branch)
+//            println("Pulling latest changes from ${gitProperties.branch}")
+//            git.pull(gitProperties.origin, gitProperties.branch)
         }
         val versionProps = VersionProperties.get()
         val updatedVersion = versionProps.increment(false)
