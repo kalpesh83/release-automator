@@ -79,7 +79,7 @@ class ReleaseManager(
                 git.commit(releaseMessage)
                 git.push(gitProperties.origin, releaseBranchName)
             }
-            val buildDetailsList = tcBuildManager.triggerBuilds(releaseBranchName)
+            val buildDetailsList = tcBuildManager.triggerBuilds(releaseBranchName, tcBuildManager.fetchBuildIds())
             if (buildDetailsList.isNotEmpty()) {
                 val buildDetailsMessage = buildDetailsList.joinToString(separator = "\n\n") {
                     "${it.buildName}\n${it.buildUrl}"
@@ -103,6 +103,10 @@ class ReleaseManager(
                         parent = tcProperties.parent
                     )
                 )
+            }
+            val publishBuildIds = tcBuildManager.fetchPublishBuildIds()
+            if (publishBuildIds.isNotEmpty()) {
+                tcBuildManager.triggerBuilds(releaseBranchName, publishBuildIds)
             }
         } else {
             updateVersionAndPush()
@@ -149,7 +153,7 @@ class ReleaseManager(
             git.commit(releaseMessage)
             git.push(gitProperties.origin, gitProperties.branch)
         }
-        tcBuildManager.triggerBuilds(gitProperties.branch)
+        tcBuildManager.triggerBuilds(gitProperties.branch, tcBuildManager.fetchBuildIds())
     }
 
     private fun addCodeOwnersIfNotExists(): Boolean {

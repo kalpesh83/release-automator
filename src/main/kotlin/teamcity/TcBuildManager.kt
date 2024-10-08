@@ -1,6 +1,7 @@
 package teamcity
 
 import KEY_BUILD_IDS
+import KEY_PUBLISH_BUILD_IDS
 import notification.SlackNotifier
 import network.RequestMethod
 import network.Service
@@ -12,21 +13,35 @@ class TcBuildManager(
     private val service: Service
 ) {
 
-    fun triggerBuilds(branch: String): List<BuildDetails> {
-        return args.fetchBuildIds().mapNotNull {
+    fun triggerBuilds(branch: String, buildIds: List<String>): List<BuildDetails> {
+        return buildIds.mapNotNull {
             println("Triggering build for id: $it")
             trigger(id = it, branch = branch)
         }
     }
 
-    private fun Array<String>.fetchBuildIds(): List<String> {
-        val i = indexOf(KEY_BUILD_IDS)
+    fun fetchBuildIds(): List<String> {
+        val i = args.indexOf(KEY_BUILD_IDS)
         if (i != -1) {
-            val valueString = getOrNull(i + 1)
+            val valueString = args.getOrNull(i + 1)
                 ?: throw IllegalArgumentException("$KEY_BUILD_IDS key is specified but value is missing!")
             val ids = valueString.split(",")
             if (ids.isEmpty()) {
                 throw IllegalArgumentException("Expected non-empty build_ids value")
+            }
+            return ids
+        }
+        return listOf()
+    }
+
+    fun fetchPublishBuildIds(): List<String> {
+        val i = args.indexOf(KEY_PUBLISH_BUILD_IDS)
+        if (i != -1) {
+            val valueString = args.getOrNull(i + 1)
+                ?: throw IllegalArgumentException("$KEY_PUBLISH_BUILD_IDS key is specified but value is missing!")
+            val ids = valueString.split(",")
+            if (ids.isEmpty()) {
+                throw IllegalArgumentException("Expected non-empty publish_build_ids value")
             }
             return ids
         }
